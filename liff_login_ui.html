@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>65th Anniversary Login</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 24px;
+      padding: 32px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 24px 0 16px;
+    }
+
+    .input-field {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 999px;
+      padding: 12px 16px;
+      margin: 8px 0;
+      background-color: #f9f9f9;
+    }
+
+    .input-field input {
+      border: none;
+      outline: none;
+      background: transparent;
+      flex-grow: 1;
+      font-size: 16px;
+      margin-left: 8px;
+    }
+
+    .login-btn {
+      width: 100%;
+      background-color: #007aff;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      border-radius: 999px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+
+    .footer-text {
+      margin-top: 32px;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>65周年<br />中秋慶祝系列活動</h1>
+    <h2>LOGIN</h2>
+
+    <div class="input-field">
+      <span>😊</span>
+      <input type="text" id="fullName" placeholder="中文全名" />
+    </div>
+
+    <div class="input-field">
+      <span>🍎</span>
+      <input type="text" id="employeeNumber" placeholder="員工編號" />
+    </div>
+
+    <button class="login-btn" onclick="submitForm()">Login</button>
+
+    <p class="footer-text">Be Bold. Be Unstoppable! 生活就是一場冒險</p>
+  </div>
+
+  <script>
+    async function submitForm() {
+      const name = document.getElementById('fullName').value;
+      const id = document.getElementById('employeeNumber').value;
+
+      if (!name || !id) {
+        alert('Please fill in both fields.');
+        return;
+      }
+
+      alert(`Hello ${name} (#${id}), welcome!`);
+      // TODO: 可改為傳送資料到後端或儲存在 localStorage
+    }
+
+    async function initLiff() {
+      await liff.init({ liffId: 'YOUR_LIFF_ID_HERE' });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      document.getElementById('fullName').value = profile.displayName;
+      // 員工編號可另從 email 或內部 API 取得
+    }
+
+    initLiff();
+  </script>
+</body>
+</html>
