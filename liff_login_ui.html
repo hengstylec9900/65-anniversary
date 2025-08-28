@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>65th Anniversary Login</title>
+  <title>65週年中秋活動登入</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body {
@@ -81,8 +81,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>65周年<br />中秋慶祝系列活動</h1>
-    <h2>LOGIN</h2>
+    <h2>遊戲登入</h2>
 
     <div class="input-field">
       <span>😊</span>
@@ -100,18 +99,33 @@
   </div>
 
   <script>
-    async function submitForm() {
-      const name = document.getElementById('fullName').value;
-      const id = document.getElementById('employeeNumber').value;
+  async function submitForm() {
+  const name = document.getElementById('fullName').value;
+  const id = document.getElementById('employeeNumber').value;
 
-      if (!name || !id) {
-        alert('Please fill in both fields.');
-        return;
-      }
+  if (!name || !id) {
+    alert('請填寫完整資料');
+    return;
+  }
 
-      alert(`Hello ${name} (#${id}), welcome!`);
-      // TODO: 可改為傳送資料到後端或儲存在 localStorage
-    }
+  const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc"; // <== 換成你自己的 URL
+
+  const res = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: name,
+      emp_id: id
+    }),
+  });
+
+  if (res.ok) {
+    alert(`歡迎 ${name}（#${id}）登入成功！`);
+  } else {
+    alert("資料傳送失敗，請稍後再試");
+  }
+}
+
 
     async function initLiff() {
       await liff.init({ liffId: '2007968657-RQJnjPVA' });
