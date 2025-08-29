@@ -109,8 +109,8 @@
     }
 
     // 儲存到 localStorage，遊戲用得到
-    localStorage.setItem('playerName', name);
-    localStorage.setItem('employeeId', id);
+    localStorage.setItem('fullName', name);
+    localStorage.setItem('employeeNumber', id);
 
     // 傳送到 Power Automate
     const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc";
