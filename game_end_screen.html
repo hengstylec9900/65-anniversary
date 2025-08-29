@@ -177,7 +177,12 @@
       const beep = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YRAAAAABAQEBAQEB");
       beep.play();
     }
-
+  const params = new URLSearchParams(window.location.search);
+  const score = params.get('score') || 0;
+  document.body.insertAdjacentHTML('afterbegin', `
+    <div style="position:absolute;top:20px;left:20px;font-size:20px;font-weight:bold;">你的冒險積分：${score}</div>
+    <button onclick="location.href='game_start_screen.html'" style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);padding:12px 24px;font-size:18px;background-color:#ff4dc4;color:white;border:none;border-radius:16px;">再玩一次</button>
+  `);
     update();
   </script>
 </body>
