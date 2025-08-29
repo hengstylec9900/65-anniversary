@@ -28,12 +28,6 @@
       text-align: center;
     }
 
-    h1 {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
     h2 {
       font-size: 32px;
       font-weight: bold;
@@ -99,56 +93,12 @@
   </div>
 
   <script>
-  async function submitForm() {
-    const name = document.getElementById('fullName').value;
-    const id = document.getElementById('employeeNumber').value;
+    let gameTarget = "game_1"; // default
 
-    if (!name || !id) {
-      alert('請填寫完整資料');
-      return;
-    }
+    window.onload = async () => {
+      const params = new URLSearchParams(window.location.search);
+      gameTarget = params.get("target") || "game_1";
 
-    // 儲存到 localStorage，遊戲用得到
-    localStorage.setItem('fullName', name);
-    localStorage.setItem('employeeNumber', id);
-
-    // 傳送到 Power Automate
-    const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc";
-
-    try {
-      const res = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name,
-          emp_id: id
-        }),
-      });
-
-      if (res.ok) {
-        // 登入成功 → 跳轉到 start.html
-        window.location.href = "game_start_screen.html";
-      } else {
-        alert("資料傳送失敗，請稍後再試");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("發生錯誤，請稍後再試");
-    }
-  }
-
-  async function initLiff() {
-    await liff.init({ liffId: '2007968657-RQJnjPVA' });
-
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
-  }
-
-  initLiff();
-
-    async function initLiff() {
       await liff.init({ liffId: '2007968657-RQJnjPVA' });
 
       if (!liff.isLoggedIn()) {
@@ -156,10 +106,56 @@
         return;
       }
 
-      // 已登入後不再自動填入 displayName
-    }
+      const uid = localStorage.getItem("uid");
+      const name = localStorage.getItem("playerName");
+      const empId = localStorage.getItem("employeeId");
 
-    initLiff();
+      if (uid && name && empId) {
+        // 已登入過，直接進入對應遊戲
+        window.location.href = `game_start_screen.html?target=${gameTarget}`;
+      }
+    };
+
+    async function submitForm() {
+      const name = document.getElementById('fullName').value;
+      const empId = document.getElementById('employeeNumber').value;
+
+      if (!name || !empId) {
+        alert('請填寫完整資料');
+        return;
+      }
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      const uid = profile.userId;
+
+      localStorage.setItem('playerName', name);
+      localStorage.setItem('employeeId', empId);
+      localStorage.setItem('uid', uid);
+
+      const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc";
+
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name,
+          emp_id: empId,
+          uid: uid,
+          action: "login"
+        })
+      });
+
+      if (res.ok) {
+        window.location.href = `game_start_screen.html?target=${gameTarget}`;
+      } else {
+        alert("資料傳送失敗，請稍後再試");
+      }
+    }
   </script>
 </body>
 </html>
