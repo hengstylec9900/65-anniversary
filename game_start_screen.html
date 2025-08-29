@@ -33,7 +33,7 @@
       padding: 24px;
     }
     .logo {
-      max-width: 400px; /* 放大 2.5 倍，原本 160px */
+      max-width: 400px;
       margin-bottom: 24px;
     }
     .card {
@@ -44,13 +44,18 @@
       max-width: 320px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+    .welcome {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
     .title {
       font-size: 20px;
       font-weight: bold;
       margin-bottom: 16px;
     }
     .gif {
-      width: 240px; /* 原本 80px x 3 倍 */
+      width: 240px;
       height: auto;
       margin: 16px 0;
     }
@@ -77,6 +82,7 @@
 
     <div class="card">
       <img id="gameImage" src="65th_year_and_brand.gif" alt="遊戲圖" class="gif" />
+      <div class="welcome" id="welcomeText"></div>
       <div class="title" id="title">第一關：恆會乒乓</div>
       <button class="start-button" id="startBtn">開始遊戲</button>
     </div>
@@ -109,11 +115,13 @@
     if (current) {
       document.getElementById("title").innerText = current.title;
       document.getElementById("gameImage").src = current.img;
-
       document.getElementById("startBtn").addEventListener("click", () => {
         window.location.href = current.url + `?target=${target}`;
       });
     }
+
+    const name = localStorage.getItem("playerName") || "挑戰者";
+    document.getElementById("welcomeText").innerText = `Hello ${name}！`;
   </script>
 </body>
 </html>
