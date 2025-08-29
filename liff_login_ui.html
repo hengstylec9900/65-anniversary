@@ -100,32 +100,53 @@
 
   <script>
   async function submitForm() {
-  const name = document.getElementById('fullName').value;
-  const id = document.getElementById('employeeNumber').value;
+    const name = document.getElementById('fullName').value;
+    const id = document.getElementById('employeeNumber').value;
 
-  if (!name || !id) {
-    alert('請填寫完整資料');
-    return;
+    if (!name || !id) {
+      alert('請填寫完整資料');
+      return;
+    }
+
+    // 儲存到 localStorage，遊戲用得到
+    localStorage.setItem('playerName', name);
+    localStorage.setItem('employeeId', id);
+
+    // 傳送到 Power Automate
+    const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc";
+
+    try {
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name,
+          emp_id: id
+        }),
+      });
+
+      if (res.ok) {
+        // 登入成功 → 跳轉到 start.html
+        window.location.href = "start.html";
+      } else {
+        alert("資料傳送失敗，請稍後再試");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("發生錯誤，請稍後再試");
+    }
   }
 
-  const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc"; // <== 換成你自己的 URL
+  async function initLiff() {
+    await liff.init({ liffId: '2007968657-RQJnjPVA' });
 
-  const res = await fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: name,
-      emp_id: id
-    }),
-  });
-
-  if (res.ok) {
-    alert(`歡迎 ${name}（#${id}）登入成功！`);
-  } else {
-    alert("資料傳送失敗，請稍後再試");
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
   }
-}
 
+  initLiff();
 
     async function initLiff() {
       await liff.init({ liffId: '2007968657-RQJnjPVA' });
