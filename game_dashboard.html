@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>冒險儀表板</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #e9f1f4;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #e9f1f4;
+      width: 360px;
+      border-radius: 30px;
+      padding: 24px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      width: 48px;
+      margin-bottom: 16px;
+    }
+    .user-info {
+      margin-bottom: 24px;
+    }
+    .user-info h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .user-info p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #444;
+    }
+    .score-card, .game-entry {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .score-card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    .score {
+      font-size: 48px;
+      font-weight: bold;
+      color: #222;
+    }
+    .game-entry h3 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    .games {
+      display: flex;
+      justify-content: space-around;
+    }
+    .game {
+      width: 60px;
+      height: 60px;
+      background: #5a566f;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 60px;
+      color: white;
+      font-size: 24px;
+      text-decoration: none;
+      position: relative;
+    }
+    .game-name {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      white-space: nowrap;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img class="logo" src="logo-65.png" alt="logo" />
+    <div class="user-info">
+      <h2 id="playerName">黃琇文</h2>
+      <p>員工編號 <span id="employeeId">6476</span></p>
+      <p>LINE UID <span id="uid">Uxxxxxxxxxxxxxx</span></p>
+    </div>
+
+    <div class="score-card">
+      <h3>冒險總分</h3>
+      <div class="score" id="totalScore">0</div>
+    </div>
+
+    <div class="game-entry">
+      <h3>系列遊戲</h3>
+      <div class="games">
+        <a class="game" href="game_1.html">1
+          <span class="game-name">恆會乒乓</span>
+        </a>
+        <a class="game" href="game_2.html">2
+          <span class="game-name">炸年糕</span>
+        </a>
+        <a class="game" href="game_3.html">3
+          <span class="game-name">極速爆球</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 從 localStorage 取出資料顯示
+    const playerName = localStorage.getItem('playerName') || '未知';
+    const employeeId = localStorage.getItem('employeeId') || '-';
+    const uid = localStorage.getItem('uid') || '-';
+
+    document.getElementById('playerName').textContent = playerName;
+    document.getElementById('employeeId').textContent = employeeId;
+    document.getElementById('uid').textContent = uid;
+
+    // 呼叫 Power Automate webhook 取得分數
+    fetch("https://your_power_automate_webhook_url", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid: uid })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('totalScore').textContent = data.total_score || '0';
+    })
+    .catch(error => {
+      console.error("無法取得總分：", error);
+    });
+  </script>
+</body>
+</html>
