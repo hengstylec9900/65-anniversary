@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>恆隆行65周年，生活就是一場冒險 - LIFF</title>
+  <title>登入頁面 - LIFF</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -15,36 +14,17 @@
       height: 100%;
       background: black;
       overflow: hidden;
-    }
-    .video-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-    }
-    video {
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .form-container {
-      position: absolute;
-      bottom: -100%;
-      left: 0;
-      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       padding: 32px 24px;
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
-      transition: bottom 1s ease-out;
-    }
-    .form-container.visible {
-      bottom: 0;
+      border-radius: 24px;
     }
     .form-container h2 {
       color: white;
@@ -79,17 +59,11 @@
   </style>
 </head>
 <body>
-  <div class="video-container">
-    <video id="introVideo" autoplay muted playsinline>
-      <source src="https://hengstylec9900.github.io/65-anniversary/65th%20Anniversary_Intro.mp4" type="video/mp4">
-    </video>
-  </div>
-
   <div class="form-container" id="formContainer">
-    <h2>誰是冒險王</h2>
-    <input type="text" id="name" placeholder="🍑 中文全名" />
-    <input type="text" id="employeeId" placeholder="🍓 員工編號" />
-    <button onclick="submitForm()">登入</button>
+    <h2>遊戲登入</h2>
+    <input type="text" id="name" placeholder="😊 中文全名" />
+    <input type="text" id="employeeId" placeholder="🎶 員工編號" />
+    <button onclick="submitForm()">Login</button>
     <div class="footer-text">Be Bold. Be Unstoppable! 生活就是一場冒險</div>
   </div>
 
@@ -104,38 +78,16 @@
         const profile = await liff.getProfile();
         lineUID = profile.userId;
         localStorage.setItem("uid", lineUID);
+
+        const name = localStorage.getItem("playerName");
+        const empId = localStorage.getItem("employeeId");
+        if (name && empId) {
+          window.location.href = "game_dashboard.html";
+        }
       }
     }
 
     initLIFF();
-
-    window.onload = () => {
-      const name = localStorage.getItem("playerName");
-      const empId = localStorage.getItem("employeeId");
-      const uid = localStorage.getItem("uid");
-      const hasLoggedIn = name && empId && uid;
-
-      const video = document.getElementById("introVideo");
-      video.onended = () => {
-        if (hasLoggedIn) {
-          window.location.href = "game_dashboard.html";
-        } else {
-          showForm();
-        }
-      };
-
-      setTimeout(() => {
-        if (hasLoggedIn) {
-          window.location.href = "game_dashboard.html";
-        } else {
-          showForm();
-        }
-      }, 8000);
-    };
-
-    function showForm() {
-      document.getElementById("formContainer").classList.add("visible");
-    }
 
     function submitForm() {
       const name = document.getElementById('name').value;
