@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -17,12 +18,15 @@
     }
     .video-container {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       z-index: -1;
     }
     video {
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       object-fit: cover;
     }
     .form-container {
@@ -77,15 +81,15 @@
 <body>
   <div class="video-container">
     <video id="introVideo" autoplay muted playsinline>
-      <source src="https://hengstylec9900.github.io/65-anniversary/65th%20Anniversary_Intro.mp4" type="video/mp4">
+      <source src="https://yourdomain.com/65th-Anniversary_Intro.mp4" type="video/mp4">
     </video>
   </div>
 
   <div class="form-container" id="formContainer">
-    <h2>開始冒險</h2>
+    <h2>遊戲登入</h2>
     <input type="text" id="name" placeholder="🍑 中文全名" />
     <input type="text" id="employeeId" placeholder="🍓 員工編號" />
-    <button onclick="submitForm()">登入</button>
+    <button onclick="submitForm()">Login</button>
     <div class="footer-text">Be Bold. Be Unstoppable! 生活就是一場冒險</div>
   </div>
 
@@ -109,7 +113,6 @@
       const name = localStorage.getItem("playerName");
       const empId = localStorage.getItem("employeeId");
       const uid = localStorage.getItem("uid");
-
       const hasLoggedIn = name && empId && uid;
 
       const video = document.getElementById("introVideo");
@@ -121,7 +124,6 @@
         }
       };
 
-      // fallback in case video never ends (timeout)
       setTimeout(() => {
         if (hasLoggedIn) {
           window.location.href = "game_dashboard.html";
