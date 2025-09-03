@@ -1,160 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>65週年中秋活動登入</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入頁面 - LIFF</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body {
+    * { box-sizing: border-box; }
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+    .video-container {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .form-container {
+      position: absolute;
+      bottom: -100%;
+      left: 0;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      padding: 32px 24px;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      transition: bottom 1s ease-out;
     }
-
-    .container {
-      background-color: white;
-      border-radius: 24px;
-      padding: 32px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      text-align: center;
+    .form-container.visible {
+      bottom: 0;
     }
-
-    h2 {
-      font-size: 32px;
-      font-weight: bold;
-      margin: 24px 0 16px;
-    }
-
-    .input-field {
-      display: flex;
-      align-items: center;
-      border: 1px solid #ccc;
-      border-radius: 999px;
-      padding: 12px 16px;
-      margin: 8px 0;
-      background-color: #f9f9f9;
-    }
-
-    .input-field input {
-      border: none;
-      outline: none;
-      background: transparent;
-      flex-grow: 1;
-      font-size: 16px;
-      margin-left: 8px;
-    }
-
-    .login-btn {
-      width: 100%;
-      background-color: #007aff;
+    .form-container h2 {
       color: white;
-      font-size: 18px;
-      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    input {
       padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
       border: none;
-      border-radius: 999px;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      padding: 12px;
+      width: 100%;
+      max-width: 300px;
+      background: #4285f4;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
       margin-top: 16px;
       cursor: pointer;
     }
-
     .footer-text {
-      margin-top: 32px;
-      color: #888;
-      font-size: 14px;
+      color: white;
+      margin-top: 12px;
+      font-size: 12px;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="video-container">
+    <video id="introVideo" autoplay muted playsinline>
+      <source src="65th Anniversary_Intro.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="form-container" id="formContainer">
     <h2>遊戲登入</h2>
-
-    <div class="input-field">
-      <span>😊</span>
-      <input type="text" id="fullName" placeholder="中文全名" />
-    </div>
-
-    <div class="input-field">
-      <span>🍎</span>
-      <input type="text" id="employeeNumber" placeholder="員工編號" />
-    </div>
-
-    <button class="login-btn" onclick="submitForm()">Login</button>
-
-    <p class="footer-text">Be Bold. Be Unstoppable! 生活就是一場冒險</p>
+    <input type="text" id="name" placeholder="🍑 中文全名" />
+    <input type="text" id="employeeId" placeholder="🍓 員工編號" />
+    <button onclick="submitForm()">Login</button>
+    <div class="footer-text">Be Bold. Be Unstoppable! 生活就是一場冒險</div>
   </div>
 
   <script>
-    let gameTarget = "game_1"; // default
+    let lineUID = "";
 
-    window.onload = async () => {
-      const params = new URLSearchParams(window.location.search);
-      gameTarget = params.get("target") || "game_1";
-
-      await liff.init({ liffId: '2007968657-RQJnjPVA' });
-
+    async function initLIFF() {
+      await liff.init({ liffId: "2007968657-RQJnjPVA" });
       if (!liff.isLoggedIn()) {
         liff.login();
-        return;
+      } else {
+        const profile = await liff.getProfile();
+        lineUID = profile.userId;
+        localStorage.setItem("uid", lineUID);
       }
+    }
 
-      const uid = localStorage.getItem("uid");
+    initLIFF();
+
+    window.onload = () => {
       const name = localStorage.getItem("playerName");
       const empId = localStorage.getItem("employeeId");
+      const uid = localStorage.getItem("uid");
 
-      if (uid && name && empId) {
-        // 已登入過，直接進入對應遊戲
-        window.location.href = `game_start_screen.html?target=${gameTarget}`;
-      }
+      const hasLoggedIn = name && empId && uid;
+
+      const video = document.getElementById("introVideo");
+      video.onended = () => {
+        if (hasLoggedIn) {
+          window.location.href = "game_dashboard.html";
+        } else {
+          showForm();
+        }
+      };
+
+      // fallback in case video never ends (timeout)
+      setTimeout(() => {
+        if (hasLoggedIn) {
+          window.location.href = "game_dashboard.html";
+        } else {
+          showForm();
+        }
+      }, 8000);
     };
 
-    async function submitForm() {
-      const name = document.getElementById('fullName').value;
-      const empId = document.getElementById('employeeNumber').value;
+    function showForm() {
+      document.getElementById("formContainer").classList.add("visible");
+    }
 
-      if (!name || !empId) {
-        alert('請填寫完整資料');
+    function submitForm() {
+      const name = document.getElementById('name').value;
+      const employeeId = document.getElementById('employeeId').value;
+
+      if (!name || !employeeId || !lineUID) {
+        alert("請輸入完整資訊，或確認 LINE 已登入");
         return;
       }
 
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
+      const loginTime = new Date().toISOString();
+      localStorage.setItem("playerName", name);
+      localStorage.setItem("employeeId", employeeId);
+      localStorage.setItem("uid", lineUID);
 
-      const profile = await liff.getProfile();
-      const uid = profile.userId;
-
-      localStorage.setItem('playerName', name);
-      localStorage.setItem('employeeId', empId);
-      localStorage.setItem('uid', uid);
-
-      const webhookUrl = "https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc";
-
-      const res = await fetch(webhookUrl, {
+      fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yNTidFFq6rV6y1unXzPSok5VlZIN7AZkMYwujZyC6bg", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          login_time: loginTime,
+          uid: lineUID,
           name: name,
-          emp_id: empId,
-          uid: uid,
-          action: "login"
+          emp_id: employeeId
         })
+      }).then(res => {
+        if (res.ok) {
+          window.location.href = "game_dashboard.html";
+        } else {
+          alert("資料儲存失敗，請稍後再試。");
+        }
       });
-
-      if (res.ok) {
-        window.location.href = `game_start_screen.html?target=${gameTarget}`;
-      } else {
-        alert("資料傳送失敗，請稍後再試");
-      }
     }
   </script>
 </body>
