@@ -144,7 +144,11 @@ function sendScore(score) {
   const name = localStorage.getItem("playerName") || "匿名";
   const empId = localStorage.getItem("employeeId") || "未填";
   const uid = localStorage.getItem("uid") || "unknown";
-  const login_time = new Date().toISOString();
+  const now = new Date();
+  const offsetMs = now.getTime() + (8 * 60 * 60 * 1000); // +8 小時
+  const taiwanTime = new Date(offsetMs);
+  const login_time = taiwanTime.toISOString().slice(0, 19).replace("T", " "); // 格式：YYYY-MM-DD HH:MM:SS
+
   const game_name = "恆會捧｜game_1";
 
   fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
