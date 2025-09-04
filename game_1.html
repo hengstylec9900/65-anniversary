@@ -1,255 +1,150 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>恆會捧｜game_1</title>
+  <title>恆會捧｜打磚塊</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
-      background: radial-gradient(ellipse at bottom, #0f2027, #203a43, #2c5364);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: sans-serif;
       overflow: hidden;
+      background: black;
+      font-family: Arial, sans-serif;
+      color: white;
     }
     canvas {
-      border: 2px solid white;
-      border-radius: 8px;
-      background-color: transparent;
-      touch-action: none;
-      z-index: 1;
+      display: block;
     }
-    #ui {
+    #hud {
       position: absolute;
       top: 10px;
       left: 10px;
-      color: white;
-      font-size: 14px;
-      font-family: monospace;
+      font-size: 18px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="360" height="480"></canvas>
-  <div id="ui">Score: 0<br>Level: 1</div>
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const ui = document.getElementById("ui");
+<div id="hud">分數：0｜難度：Lv.1</div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
 
-    let level = 1;
-    const paddle = { width: 70, height: 10, x: canvas.width / 2 - 35, y: canvas.height - 20, dx: 6 };
-    const ball = { x: canvas.width / 2, y: canvas.height - 30, radius: 7, dx: 3, dy: -3 };
-    let brick = { rowCount: 4, colCount: 5, width: 60, height: 15, padding: 10, offsetTop: 40, offsetLeft: 20 };
-    let bricks = [], score = 0, isGameOver = false, scoreSent = false, particles = [], ballTrail = [];
-    const colors = ["#ff4dc4", "#ffd166", "#06d6a0", "#118ab2", "#ef476f"];
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    function initBricks() {
-      bricks = [];
-      for (let r = 0; r < brick.rowCount; r++) {
-        bricks[r] = [];
-        for (let c = 0; c < brick.colCount; c++) {
-          bricks[r][c] = { x: 0, y: 0, status: 1, color: colors[(r + c) % colors.length] };
-        }
-      }
-    }
-    initBricks();
+let paddleX = canvas.width / 2 - 40;
+let ballX = canvas.width / 2;
+let ballY = canvas.height - 30;
+let ballSpeedX = 2;
+let ballSpeedY = -3;
+let score = 0;
+let level = 1;
+let isGameOver = false;
 
-    function drawPaddle() {
-      ctx.fillStyle = "white";
-      ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+const bricks = [];
+const brickRows = 4;
+const brickCols = 6;
+const brickWidth = 60;
+const brickHeight = 20;
+const colors = ["#f8fd46", "#E32E35", "#34c9eb", "#ff7f50", "#9acd32", "#f08080"];
+
+function createBricks() {
+  bricks.length = 0;
+  for (let row = 0; row < brickRows + level; row++) {
+    for (let col = 0; col < brickCols; col++) {
+      bricks.push({ x: col * 65 + 10, y: row * 25 + 40, status: 1, color: colors[(row + col) % colors.length] });
     }
-    function drawBall() {
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#fff";
-      ctx.fill();
-      ctx.closePath();
+  }
+}
+createBricks();
+
+function drawBricks() {
+  bricks.forEach(b => {
+    if (b.status) {
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, b.y, brickWidth, brickHeight);
     }
-    function drawTrail() {
-      for (let i = 0; i < ballTrail.length; i++) {
-        const t = ballTrail[i];
-        ctx.beginPath();
-        ctx.arc(t.x, t.y, ball.radius * 0.6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${1 - i / ballTrail.length})`;
-        ctx.fill();
-        ctx.closePath();
+  });
+}
+
+document.addEventListener("touchmove", function(e) {
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  paddleX = touch.clientX - rect.left - 40;
+});
+
+function drawPaddle() {
+  ctx.fillStyle = "white";
+  ctx.fillRect(paddleX, canvas.height - 20, 80, 10);
+}
+
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
+  ctx.fillStyle = "cyan";
+  ctx.fill();
+  ctx.closePath();
+}
+
+function drawHUD() {
+  document.getElementById("hud").innerText = "分數：" + score + "｜難度：Lv." + level;
+}
+
+function draw() {
+  if (isGameOver) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBricks();
+  drawPaddle();
+  drawBall();
+  drawHUD();
+
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  if (ballX < 10 || ballX > canvas.width - 10) ballSpeedX = -ballSpeedX;
+  if (ballY < 10) ballSpeedY = -ballSpeedY;
+
+  if (ballY > canvas.height - 30 && ballX > paddleX && ballX < paddleX + 80) {
+    ballSpeedY = -ballSpeedY;
+  }
+
+  bricks.forEach(b => {
+    if (b.status &&
+        ballX > b.x && ballX < b.x + brickWidth &&
+        ballY > b.y && ballY < b.y + brickHeight) {
+      ballSpeedY = -ballSpeedY;
+      b.status = 0;
+      score++;
+      level = Math.floor(score / 10) + 1;
+      if (score % 10 === 0) {
+        ballSpeedX *= 1.1;
+        ballSpeedY *= 1.1;
+        createBricks();
       }
     }
-    function drawBricks() {
-      for (let r = 0; r < brick.rowCount; r++) {
-        for (let c = 0; c < brick.colCount; c++) {
-          const b = bricks[r][c];
-          if (b.status === 1) {
-            const bx = c * (brick.width + brick.padding) + brick.offsetLeft;
-            const by = r * (brick.height + brick.padding) + brick.offsetTop;
-            b.x = bx;
-            b.y = by;
-            ctx.fillStyle = b.color;
-            ctx.fillRect(bx, by, brick.width, brick.height);
-          }
-        }
-      }
-    }
-    function drawParticles() {
-      particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
-        ctx.fill();
-        ctx.closePath();
-      });
-    }
-    function spawnParticles(x, y) {
-      for (let i = 0; i < 20; i++) {
-        particles.push({
-          x, y,
-          radius: Math.random() * 2 + 1,
-          r: Math.floor(Math.random() * 256),
-          g: Math.floor(Math.random() * 256),
-          b: Math.floor(Math.random() * 256),
-          dx: (Math.random() - 0.5) * 4,
-          dy: (Math.random() - 0.5) * 4,
-          alpha: 1
-        });
-      }
-    }
-    function updateParticles() {
-      particles.forEach(p => {
-        p.x += p.dx;
-        p.y += p.dy;
-        p.alpha -= 0.02;
-      });
-      particles = particles.filter(p => p.alpha > 0);
-    }
-    function playBeep() {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "square";
-      osc.frequency.value = 400;
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
-      osc.stop(ctx.currentTime + 0.2);
-    }
-    function playFireworkSound() {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.6);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      gain.gain.setValueAtTime(1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.6);
-    }
-    function collisionDetection() {
-      for (let r = 0; r < brick.rowCount; r++) {
-        for (let c = 0; c < brick.colCount; c++) {
-          const b = bricks[r][c];
-          if (b.status === 1) {
-            if (ball.x > b.x && ball.x < b.x + brick.width && ball.y > b.y && ball.y < b.y + brick.height) {
-              ball.dy = -ball.dy;
-              b.status = 0;
-              score++;
-              spawnParticles(ball.x, ball.y);
-              playBeep();
-              updateDifficulty();
-              if (score === brick.rowCount * brick.colCount) {
-                playFireworkSound();
-                gameOver();
-              }
-            }
-          }
-        }
-      }
-    }
-    function updateDifficulty() {
-      if (score === 10) {
-        brick.rowCount += 1;
-        level = 2;
-        initBricks();
-      }
-      if (score === 20) {
-        paddle.width = 60;
-        ball.dx *= 1.2;
-        ball.dy *= 1.2;
-        level = 3;
-      }
-      ui.innerHTML = `Score: ${score}<br>Level: ${level}`;
-    }
-    function moveBall() {
-      ball.x += ball.dx;
-      ball.y += ball.dy;
-      if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.dx = -ball.dx;
-      if (ball.y - ball.radius < 0) ball.dy = -ball.dy;
-      else if (ball.y + ball.radius > canvas.height) gameOver();
-      if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) ball.dy = -ball.dy;
-    }
-    function draw() {
-      if (isGameOver) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawTrail();
-      drawBricks();
-      drawParticles();
-      drawBall();
-      drawPaddle();
-      drawScore();
-      collisionDetection();
-      moveBall();
-      movePaddle();
-      updateParticles();
-      ballTrail.push({ x: ball.x, y: ball.y });
-      if (ballTrail.length > 10) ballTrail.shift();
-      requestAnimationFrame(draw);
-    }
-    function drawScore() {
-      // handled in #ui
-    }
-    function movePaddle() {
-      if (leftPressed) paddle.x -= paddle.dx;
-      if (rightPressed) paddle.x += paddle.dx;
-      if (paddle.x < 0) paddle.x = 0;
-      if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
-    }
-    let leftPressed = false, rightPressed = false;
-    document.addEventListener("keydown", e => {
-      if (e.key === "ArrowLeft") leftPressed = true;
-      else if (e.key === "ArrowRight") rightPressed = true;
-    });
-    document.addEventListener("keyup", e => {
-      if (e.key === "ArrowLeft") leftPressed = false;
-      else if (e.key === "ArrowRight") rightPressed = false;
-    });
-    canvas.addEventListener("touchmove", e => {
-      const touchX = e.touches[0].clientX;
-      const rect = canvas.getBoundingClientRect();
-      paddle.x = touchX - rect.left - paddle.width / 2;
-    });
-    function gameOver() {
-      isGameOver = true;
-      if (!scoreSent) {
-        sendScore(score);
-        scoreSent = true;
-      }
-      setTimeout(() => {
-        window.location.href = `game_end_screen.html?target=game_1&score=${score}`;
-      }, 1000);
-    }
+  });
+
+  if (ballY > canvas.height) {
+    isGameOver = true;
+    localStorage.setItem("latestScore", score);
+    sendScore(score);
+    setTimeout(() => {
+      window.location.href = "game_end_screen.html";
+    }, 1000);
+  }
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+
 function sendScore(score) {
   const name = localStorage.getItem("playerName") || "匿名";
   const empId = localStorage.getItem("employeeId") || "未填";
   const uid = localStorage.getItem("uid") || "unknown";
-  const login_time = new Date().toISOString(); // 加上登入時間
+  const login_time = new Date().toISOString();
   const game_name = "恆會捧｜game_1";
 
   fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
@@ -263,16 +158,8 @@ function sendScore(score) {
       game_name,
       score
     })
-  })
-  .then(res => {
-    if (res.ok) {
-      console.log("✅ 分數已成功送出");
-    } else {
-      console.error("❌ 分數送出失敗");
-    }
   });
 }
-    draw();
-  </script>
+</script>
 </body>
 </html>
