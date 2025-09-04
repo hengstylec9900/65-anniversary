@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>遊戲結束</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100vh;
+    }
+    #logo {
+      width: 120px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .buttons {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-direction: column;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background: #e430b0;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas" width="400" height="600"></canvas>
+  <img id="logo" src="logo-65.png" alt="活動主視覺" />
+  <h1 id="greeting">恭喜完成遊戲！</h1>
+  <h2 id="scoreDisplay"></h2>
+  <div class="buttons">
+    <button onclick="playAgain()">再玩一次</button>
+    <button onclick="goToDashboard()">回到冒險儀表板</button>
+  </div>
+
+<script>
+  const name = localStorage.getItem("playerName") || "玩家";
+  const score = localStorage.getItem("latestScore") || 0;
+  const gameName = localStorage.getItem("currentGame") || "未知遊戲";
+
+  document.getElementById("greeting").innerText = `Hi ${name}！你完成了 ${gameName}`;
+  document.getElementById("scoreDisplay").innerText = `這次得分：${score}`;
+
+  function playAgain() {
+    const game = localStorage.getItem("currentGameFile") || "game_1.html";
+    window.location.href = game;
+  }
+
+  function goToDashboard() {
+    window.location.href = "game_dashboard.html";
+  }
+
+  // 星空背景動畫
+  const canvas = document.getElementById("bgCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const stars = Array.from({length: 100}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2,
+    speed: Math.random() * 0.5 + 0.2
+  }));
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let s of stars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      s.y += s.speed;
+      if (s.y > canvas.height) {
+        s.y = 0;
+        s.x = Math.random() * canvas.width;
+      }
+    }
+    requestAnimationFrame(drawStars);
+  }
+
+  drawStars();
+</script>
+</body>
+</html>
