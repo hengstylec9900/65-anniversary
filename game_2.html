@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>恆會吃｜game_2</title>
+  <title>恆會吃｜Game_2</title>
   <style>
     html, body {
       margin: 0;
@@ -169,6 +169,8 @@ canvas.addEventListener("touchmove", function(e) {
 });
 
 function sendScore(score) {
+  localStorage.setItem("currentGame", "恆會吃｜game_2");
+  localStorage.setItem("currentGameFile", "game_2.html");
   const name = localStorage.getItem("playerName") || "匿名";
   const empId = localStorage.getItem("employeeId") || "未填";
   const uid = localStorage.getItem("uid") || "unknown";
