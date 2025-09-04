@@ -245,16 +245,33 @@
         window.location.href = `game_end_screen.html?target=game_1&score=${score}`;
       }, 1000);
     }
-    function sendScore(score) {
-      const name = localStorage.getItem("playerName") || "匿名";
-      const empId = localStorage.getItem("employeeId") || "未填";
-      const uid = localStorage.getItem("uid") || "unknown";
-      fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, emp_id: empId, uid, game_name: "恆會捧｜game_1", score })
-      }).then(res => res.ok ? console.log("分數已送出") : console.error("送出失敗"));
+function sendScore(score) {
+  const name = localStorage.getItem("playerName") || "匿名";
+  const empId = localStorage.getItem("employeeId") || "未填";
+  const uid = localStorage.getItem("uid") || "unknown";
+  const login_time = new Date().toISOString(); // 加上登入時間
+  const game_name = "恆會捧｜game_1";
+
+  fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      login_time,
+      uid,
+      playerName: name,
+      employeeId: empId,
+      game_name,
+      score
+    })
+  })
+  .then(res => {
+    if (res.ok) {
+      console.log("✅ 分數已成功送出");
+    } else {
+      console.error("❌ 分數送出失敗");
     }
+  });
+}
     draw();
   </script>
 </body>
