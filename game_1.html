@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>恆會磚塊｜game_1</title>
+  <title>恆會捧｜game_1</title>
   <style>
     html, body {
       margin: 0;
@@ -249,10 +249,10 @@
       const name = localStorage.getItem("playerName") || "匿名";
       const empId = localStorage.getItem("employeeId") || "未填";
       const uid = localStorage.getItem("uid") || "unknown";
-      fetch("https://prod-75.southeastasia.logic.azure.com:443/workflows/cf7cf6649b1d48679e59af7297be0842/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DclyaeE-0TwInKJWffnGLmc6Nny-Cn8oZnn4Ds6jxkc", {
+      fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, emp_id: empId, uid, game_name: "恆會磚塊", score })
+        body: JSON.stringify({ name, emp_id: empId, uid, game_name: "恆會捧｜game_1", score })
       }).then(res => res.ok ? console.log("分數已送出") : console.error("送出失敗"));
     }
     draw();
