@@ -128,7 +128,7 @@
     document.getElementById('uid').textContent = uid;
 
     // 呼叫 Power Automate webhook 取得分數
-    fetch("https://your_power_automate_webhook_url", {
+    fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/81f2f9ab1dbd42e2a712ca0dd2097d52/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xptj3jJkm2esvS_wsi3iMM9z02UROzpIVoKUJ72xTkA", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ uid: uid })
