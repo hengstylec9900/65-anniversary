@@ -3,143 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>65周年冒險活動</title>
+  <title>遊戲總覽｜Game Dashboard</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: #e9f1f4;
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #eaf0f3;
+      padding: 20px;
     }
     .container {
-      background: #e9f1f4;
-      width: 360px;
-      border-radius: 30px;
+      max-width: 420px;
+      margin: auto;
+      background: white;
       padding: 24px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 0 16px rgba(0,0,0,0.05);
     }
     .logo {
-      width: 48px;
-      margin-bottom: 16px;
+      display: block;
+      width: 140px;
+      margin: 0 auto 20px;
     }
     .user-info {
-      margin-bottom: 24px;
+      text-align: center;
+      margin-bottom: 16px;
     }
-    .user-info h2 {
-      margin: 0;
+    .user-info .name {
       font-size: 20px;
+      font-weight: bold;
     }
-    .user-info p {
-      margin: 4px 0;
+    .user-info .id,
+    .user-info .uid {
+      font-size: 14px;
+      color: #666;
+    }
+    .score-box {
+      background: #f7f9fb;
+      padding: 16px;
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+    .score-box h3 {
+      margin: 0;
       font-size: 14px;
       color: #444;
-    }
-    .score-card, .game-entry {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .score-card h3 {
-      margin: 0;
-      font-size: 14px;
-      color: #666;
+      text-align: left;
     }
     .score {
-      font-size: 48px;
+      font-size: 36px;
       font-weight: bold;
+      text-align: left;
+      margin-top: 8px;
       color: #222;
     }
-    .game-entry h3 {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 12px;
+    .game-section {
+      margin-top: 24px;
     }
-    .games {
-      display: flex;
-      justify-content: space-around;
+    .game-item {
+      margin-bottom: 20px;
     }
-    .game {
-      width: 60px;
-      height: 60px;
-      background: #5a566f;
-      border-radius: 50%;
-      text-align: center;
-      line-height: 60px;
-      color: white;
-      font-size: 24px;
-      text-decoration: none;
-      position: relative;
+    .game-item small {
+      display: block;
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 6px;
     }
-    .game-name {
-      position: absolute;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      white-space: nowrap;
-      color: #333;
+    .game-button {
+      display: block;
+      width: 100%;
+      border-radius: 16px;
+      height: auto;
+      object-fit: contain;
+      border: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img class="logo" src="logo-65.png" alt="logo" />
+    <img src="logo-65.png" alt="65 Logo" class="logo"/>
     <div class="user-info">
-      <h2 id="playerName">黃琇文</h2>
-      <p>員工編號 <span id="employeeId">6476</span></p>
-      <p>LINE UID <span id="uid">Uxxxxxxxxxxxxxx</span></p>
+      <div class="name" id="playerName">王小明</div>
+      <div class="id" id="employeeId">員工編號 0000</div>
+      <div class="uid" id="uid">LINE UID XXXXXXXXXXXX</div>
     </div>
 
-    <div class="score-card">
+    <div class="score-box">
       <h3>冒險總分</h3>
       <div class="score" id="totalScore">0</div>
     </div>
 
-    <div class="game-entry">
-      <h3>系列遊戲</h3>
-      <div class="games">
-        <a class="game" href="game_1.html">1
-          <span class="game-name">恆會捧</span>
+    <div class="game-section">
+      <div class="game-item">
+        <small>2025年9月15日上架｜恆會捧</small>
+        <a href="game_1.html">
+          <img src="https://hengstylec9900.github.io/65-anniversary/game_1_icon.png" alt="game 1" class="game-button" />
         </a>
-        <a class="game" href="game_2.html">2
-          <span class="game-name">恆會吃</span>
+      </div>
+      <div class="game-item">
+        <small>2025年9月15日上架｜恆會吃</small>
+        <a href="game_2.html">
+          <img src="https://hengstylec9900.github.io/65-anniversary/game_2_icon.png" alt="game 2" class="game-button" />
         </a>
-        <a class="game" href="game_3.html">3
-          <span class="game-name">極速爆球</span>
+      </div>
+      <div class="game-item">
+        <small>2025年9月15日上架｜恆會喊</small>
+        <a href="game_3.html">
+          <img src="https://hengstylec9900.github.io/65-anniversary/game_3_icon.png" alt="game 3" class="game-button" />
         </a>
       </div>
     </div>
   </div>
 
   <script>
-    // 從 localStorage 取出資料顯示
-    const playerName = localStorage.getItem('playerName') || '未知';
-    const employeeId = localStorage.getItem('employeeId') || '-';
-    const uid = localStorage.getItem('uid') || '-';
+    const name = localStorage.getItem("playerName") || "匿名";
+    const empId = localStorage.getItem("employeeId") || "0000";
+    const uid = localStorage.getItem("uid") || "未登入";
 
-    document.getElementById('playerName').textContent = playerName;
-    document.getElementById('employeeId').textContent = employeeId;
-    document.getElementById('uid').textContent = uid;
+    document.getElementById("playerName").innerText = name;
+    document.getElementById("employeeId").innerText = `員工編號 ${empId}`;
+    document.getElementById("uid").innerText = `LINE UID ${uid}`;
 
-    // 呼叫 Power Automate webhook 取得分數
-    fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/81f2f9ab1dbd42e2a712ca0dd2097d52/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xptj3jJkm2esvS_wsi3iMM9z02UROzpIVoKUJ72xTkA", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: uid })
-    })
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('totalScore').textContent = data.total_score || '0';
-    })
-    .catch(error => {
-      console.error("無法取得總分：", error);
-    });
+    const score = localStorage.getItem("totalScore") || "0";
+    document.getElementById("totalScore").innerText = score;
   </script>
 </body>
 </html>
