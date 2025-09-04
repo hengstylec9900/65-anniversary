@@ -76,6 +76,7 @@
       analyser.getByteFrequencyData(dataArray);
       const volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
       volumeHistory.push(volume);
+      triggerFireworks(volume);
       updateBar(volume);
       requestAnimationFrame(measure);
     };
@@ -92,7 +93,11 @@
     r: Math.random() * 2,
     speed: Math.random() * 0.4 + 0.2
   }));
+  
+  const fireworks = [];
+
   function drawStars() {
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let s of stars) {
       ctx.beginPath();
@@ -105,7 +110,27 @@
         s.x = Math.random() * canvas.width;
       }
     }
+    
+    // 🔥 畫煙火
+    for (let i = fireworks.length - 1; i >= 0; i--) {
+      const f = fireworks[i];
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+      ctx.fillStyle = f.color;
+      ctx.globalAlpha = f.alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      f.x += f.dx;
+      f.y += f.dy;
+      f.alpha -= 0.02;
+      if (f.alpha <= 0) {
+        fireworks.splice(i, 1);
+      }
+    }
+
     requestAnimationFrame(drawStars);
+
   }
   drawStars();
 
@@ -127,7 +152,7 @@
     }
 
     localStorage.setItem("latestScore", score);
-    localStorage.setItem("currentGame", "「恆會喊」");
+    localStorage.setItem("currentGame", "恆會喊｜game_3");
     localStorage.setItem("currentGameFile", "game_3.html");
 
     sendScore(score);
