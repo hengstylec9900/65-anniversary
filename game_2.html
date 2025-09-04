@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>恆會吃｜game_2</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      background: radial-gradient(circle at center, #1a1a2e, #000);
+    }
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 16px;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+<div id="hud">分數：0</div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scale = 20;
+const rows = canvas.height / scale;
+const columns = canvas.width / scale;
+
+let snake;
+let food;
+let direction = 'RIGHT';
+let speed = 200;
+let score = 0;
+let gameLoop;
+
+class Snake {
+  constructor() {
+    this.body = [
+      {x: 5, y: 5}
+    ];
+  }
+
+  draw() {
+    ctx.fillStyle = '#00ffcc';
+    for (let part of this.body) {
+      ctx.fillRect(part.x * scale, part.y * scale, scale - 2, scale - 2);
+    }
+  }
+
+  update() {
+    const head = { ...this.body[this.body.length - 1] };
+
+    if (direction === 'UP') head.y -= 1;
+    if (direction === 'DOWN') head.y += 1;
+    if (direction === 'LEFT') head.x -= 1;
+    if (direction === 'RIGHT') head.x += 1;
+
+    this.body.push(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      score++;
+      document.getElementById('hud').innerText = '分數：' + score;
+      if (score % 5 === 0 && speed > 50) {
+        clearInterval(gameLoop);
+        speed -= 20;
+        gameLoop = setInterval(gameTick, speed);
+      }
+      placeFood();
+    } else {
+      this.body.shift();
+    }
+
+    if (this.checkCollision(head)) {
+      clearInterval(gameLoop);
+      localStorage.setItem("latestScore", score);
+      sendScore(score);
+      setTimeout(() => {
+        window.location.href = "game_end_screen.html";
+      }, 1000);
+    }
+  }
+
+  checkCollision(head) {
+    if (head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows) return true;
+    for (let i = 0; i < this.body.length - 1; i++) {
+      if (this.body[i].x === head.x && this.body[i].y === head.y) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+function placeFood() {
+  food = {
+    x: Math.floor(Math.random() * columns),
+    y: Math.floor(Math.random() * rows)
+  };
+}
+
+function drawFood() {
+  ctx.fillStyle = '#ff69b4';
+  ctx.beginPath();
+  ctx.arc(food.x * scale + scale / 2, food.y * scale + scale / 2, scale / 2.5, 0, 2 * Math.PI);
+  ctx.fill();
+}
+
+function gameTick() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawStars();
+  snake.update();
+  snake.draw();
+  drawFood();
+}
+
+function drawStars() {
+  for (let i = 0; i < 15; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const radius = Math.random() * 1.5;
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+  if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+  if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+  if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+});
+
+let touchStartX = null;
+let touchStartY = null;
+canvas.addEventListener("touchstart", function(e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+});
+canvas.addEventListener("touchmove", function(e) {
+  if (!touchStartX || !touchStartY) return;
+  let deltaX = e.touches[0].clientX - touchStartX;
+  let deltaY = e.touches[0].clientY - touchStartY;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 0 && direction !== "LEFT") direction = "RIGHT";
+    else if (deltaX < 0 && direction !== "RIGHT") direction = "LEFT";
+  } else {
+    if (deltaY > 0 && direction !== "UP") direction = "DOWN";
+    else if (deltaY < 0 && direction !== "DOWN") direction = "UP";
+  }
+
+  touchStartX = null;
+  touchStartY = null;
+});
+
+function sendScore(score) {
+  const name = localStorage.getItem("playerName") || "匿名";
+  const empId = localStorage.getItem("employeeId") || "未填";
+  const uid = localStorage.getItem("uid") || "unknown";
+  const login_time = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 19).replace("T", " ");
+  const game_name = "恆會吃｜game_2";
+
+  fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      login_time,
+      uid,
+      playerName: name,
+      employeeId: empId,
+      game_name,
+      score
+    })
+  });
+}
+
+function startGame() {
+  snake = new Snake();
+  placeFood();
+  gameLoop = setInterval(gameTick, speed);
+}
+
+startGame();
+</script>
+</body>
+</html>
