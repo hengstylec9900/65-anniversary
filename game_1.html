@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>恆會捧｜打磚塊</title>
+  <title>恆會捧｜Game_1</title>
   <style>
     body {
       margin: 0;
@@ -141,6 +141,8 @@ function draw() {
 draw();
 
 function sendScore(score) {
+  localStorage.setItem("currentGame", "恆會捧｜game_1");
+  localStorage.setItem("currentGameFile", "game_1.html");
   const name = localStorage.getItem("playerName") || "匿名";
   const empId = localStorage.getItem("employeeId") || "未填";
   const uid = localStorage.getItem("uid") || "unknown";
