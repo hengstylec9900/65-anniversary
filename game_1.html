@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>恆會捧｜Game_1</title>
+  <title>恆會接｜Game_1</title>
   <style>
     body {
       margin: 0;
@@ -32,7 +32,7 @@
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-localStorage.setItem("currentGame", "恆會捧｜Game_1");
+localStorage.setItem("currentGame", "恆會接｜Game_1");
 localStorage.setItem("currentGameFile", "game_1.html");
 
 let paddleX = canvas.width / 2 - 40;
@@ -150,7 +150,7 @@ function addScoreAndSend(score) {
   const offsetMs = now.getTime() + (8 * 60 * 60 * 1000); // +8 小時
   const taiwanTime = new Date(offsetMs);
   const login_time = taiwanTime.toISOString().slice(0, 19).replace("T", " "); // 格式：YYYY-MM-DD HH:MM:SS
-  const game_name = "恆會捧｜game_1";
+  const game_name = "恆會接｜Game_1";
 
     // 加總總分
   const prevTotal = parseInt(localStorage.getItem("totalScore") || "0");
