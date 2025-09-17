@@ -15,7 +15,7 @@
     }
     h1 {
       margin-top: 30px;
-      font-size: 24px;
+      font-size: 16px;
     }
     #meter {
       margin: 40px auto;
@@ -59,6 +59,8 @@
     let volumeHistory = [];
     let score = 0;
     const duration = 10;
+    localStorage.setItem("currentGame", "恆會喊｜game_3");
+
 
     async function startMic() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -117,18 +119,24 @@
       localStorage.setItem("currentGame", "恆會喊｜game_3");
       localStorage.setItem("currentGameFile", "game_3.html");
 
-      sendScore(score);
+      addScoreAndSend(score);
       setTimeout(() => {
         window.location.href = "game_end_screen.html";
       }, 1200);
     }
 
-    function sendScore(score) {
+    function addScoreAndSend(score) {
       const name = localStorage.getItem("playerName") || "匿名";
       const empId = localStorage.getItem("employeeId") || "未填";
       const uid = localStorage.getItem("uid") || "unknown";
       const login_time = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 19).replace("T", " ");
       const game_name = "恆會喊｜game_3";
+
+        // 加總總分
+      const prevTotal = parseInt(localStorage.getItem("totalScore") || "0");
+      const newTotal = prevTotal + score;
+      localStorage.setItem("totalScore", newTotal);
+      localStorage.setItem("latestScore", score); // 順便更新最新一場分數
 
       fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
         method: "POST",
@@ -139,7 +147,8 @@
           playerName: name,
           employeeId: empId,
           game_name,
-          score
+          score,
+          total_score: newTotal
         })
       });
     }
