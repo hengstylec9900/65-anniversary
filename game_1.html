@@ -32,6 +32,8 @@
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+localStorage.setItem("currentGame", "恆會捧｜Game_1");
+localStorage.setItem("currentGameFile", "game_1.html");
 
 let paddleX = canvas.width / 2 - 40;
 let ballX = canvas.width / 2;
@@ -129,7 +131,7 @@ function draw() {
   if (ballY > canvas.height) {
     isGameOver = true;
     localStorage.setItem("latestScore", score);
-    sendScore(score);
+    addScoreAndSend(score);
     setTimeout(() => {
       window.location.href = "game_end_screen.html";
     }, 1000);
@@ -140,9 +142,7 @@ function draw() {
 
 draw();
 
-function sendScore(score) {
-  localStorage.setItem("currentGame", "恆會捧｜game_1");
-  localStorage.setItem("currentGameFile", "game_1.html");
+function addScoreAndSend(score) {
   const name = localStorage.getItem("playerName") || "匿名";
   const empId = localStorage.getItem("employeeId") || "未填";
   const uid = localStorage.getItem("uid") || "unknown";
@@ -150,8 +150,13 @@ function sendScore(score) {
   const offsetMs = now.getTime() + (8 * 60 * 60 * 1000); // +8 小時
   const taiwanTime = new Date(offsetMs);
   const login_time = taiwanTime.toISOString().slice(0, 19).replace("T", " "); // 格式：YYYY-MM-DD HH:MM:SS
-
   const game_name = "恆會捧｜game_1";
+
+    // 加總總分
+  const prevTotal = parseInt(localStorage.getItem("totalScore") || "0");
+  const newTotal = prevTotal + score;
+  localStorage.setItem("totalScore", newTotal);
+  localStorage.setItem("latestScore", score); // 順便更新最新一場分數
 
   fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
     method: "POST",
@@ -162,7 +167,8 @@ function sendScore(score) {
       playerName: name,
       employeeId: empId,
       game_name,
-      score
+      score,
+      total_score: newTotal
     })
   });
 }
