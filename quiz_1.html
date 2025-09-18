@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>恆會知｜公司歷史測驗（限玩 3 次）</title>
+  <title>恆會答｜Quiz 1（限玩 3 次）</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root { --accent:#e430b0; --bg:#f5f7fa; --card:#fff; --text:#111; --muted:#666; }
@@ -48,14 +48,14 @@
       <div class="title">
         <img src="https://hengstylec9900.github.io/65-anniversary/logo-65.png" alt="65周年"/>
         <div>
-          <h2 style="margin:0">恆會知｜公司歷史測驗</h2>
-          <div class="subtitle">每題作答後即鎖定不可再改。倒數 30 秒自動結算。<br/>每位玩家本活動限玩 <b>3 次</b>。</div>
+          <h2 style="margin:0">恆會答｜Quiz 1</h2>
+          <div class="subtitle">每題作答後即鎖定不可再改。倒數 10 秒自動結算。<br/>每位玩家本活動限玩 <b>3 次</b>。</div>
         </div>
       </div>
       <div class="row">
         <div>玩家：<span id="playerName">-</span>｜員編：<span id="employeeId">-</span></div>
         <div class="pill">UID: <span id="uid">-</span></div>
-        <div class="timer" id="timer">倒數 30 秒</div>
+        <div class="timer" id="timer">倒數 10 秒</div>
         <div class="limit" id="limit">剩餘次數：3</div>
       </div>
 
@@ -71,9 +71,9 @@
   </div>
 
 <script>
-const POINTS_PER_CORRECT = 10;
-const QUIZ_NAME = "恆會知｜公司歷史測驗";
-const QUIZ_DURATION_SEC = 30;
+const POINTS_PER_CORRECT = 20;
+const QUIZ_NAME = "恆會答｜Quiz 1";
+const QUIZ_DURATION_SEC = 10;
 const MAX_ATTEMPTS = 3;
 
 const QUESTIONS = [
@@ -246,7 +246,7 @@ function finalize(auto=false){
   localStorage.setItem("totalScore", newTotal);
   localStorage.setItem("latestScore", score);
   localStorage.setItem("currentGame", QUIZ_NAME);
-  localStorage.setItem("currentGameFile", "quiz_history.html");
+  localStorage.setItem("currentGameFile", "quiz_1.html");
 
   const payload = {
     login_time: twNowString(),
