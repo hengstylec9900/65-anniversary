@@ -203,7 +203,40 @@ function startGame() {
   gameLoop = setInterval(gameTick, speed);
 }
 
-startGame();
+// === 每日遊玩限制 ===
+const MAX_PLAYS = 5;           // 每日上限
+const gameId = "game_2";       // 此頁遊戲 ID
+
+function todayTW() {
+  const now = new Date();
+  const tw = new Date(now.getTime() + 8*60*60*1000);
+  return tw.toISOString().slice(0,10); // YYYY-MM-DD
+}
+
+function getPlayKey() {
+  const uid = localStorage.getItem("uid") || "device";
+  return `plays:${uid}:${gameId}:${todayTW()}`;
+}
+
+function getPlays() {
+  return parseInt(localStorage.getItem(getPlayKey()) || "0", 10);
+}
+
+function addPlay() {
+  const count = getPlays() + 1;
+  localStorage.setItem(getPlayKey(), count);
+  return count;
+}
+
+// === 進入頁面先檢查 ===
+if (getPlays() >= MAX_PLAYS) {
+  alert(`今天「恆會吃」已玩 ${MAX_PLAYS} 次，請明天再來！`);
+  window.location.href = "game_dashboard.html"; // 你可改成留在畫面上
+} else {
+  addPlay(); // 登記一次
+  startGame(); // 啟動遊戲
+}
+
 </script>
 </body>
 </html>
