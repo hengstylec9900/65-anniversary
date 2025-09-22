@@ -117,12 +117,18 @@
           <img src="https://hengstylec9900.github.io/65-anniversary/quiz_1_icon.png" alt="quiz 1" class="game-button" />
         </a>
       </div>
+      <div class="game-item" id="whitelist-game">
+        <small>【最新發布】恆會吃｜第三關</small>
+        <a href="game_2.html">
+          <img src="https://hengstylec9900.github.io/65-anniversary/game_2_icon.png" alt="game 2" class="game-button" />
+        </a>
+      </div>
     </div>
 
     <!-- 新增：最新消息 -->
     <div class="section-title">公告區</div>
     <div class="card news-item">
-      2025-09-19 00:00｜晚上要早點睡覺，不要一直在刷遊戲歐。
+      2025-09-22 08:00｜恆有勁 65 周年烤肉活動，即將在本周五舉行。
     </div>
 
     <!-- 新增：開發者資訊 -->
@@ -137,6 +143,18 @@
     const name = localStorage.getItem("playerName") || "匿名";
     const empId = localStorage.getItem("employeeId") || "0000";
     const uid = localStorage.getItem("uid") || "未登入";
+    
+    // 設定允許看到 game_1 的 UID 清單
+    const allowedUIDs = ["U86cd3d9a889d7b3c50560ae34d154b1e"]; 
+    // ↑ 這裡填入「允許看到遊戲」的 LINE UID
+    const currentUID = localStorage.getItem("uid");
+    
+    // 判斷：如果不在白名單，就隱藏 whitelist-game
+    if (!allowedUIDs.includes(currentUID)) {
+      const gameBlock = document.getElementById("whitelist-game");
+      if (gameBlock) gameBlock.style.display = "none";
+    }
+
 
     document.getElementById("playerName").innerText = name;
     document.getElementById("employeeId").innerText = `員工編號 ${empId}`;
