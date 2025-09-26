@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>恆會答｜Quiz 2（每日限 3 次）</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root { --accent:#e430b0; --bg:#f5f7fa; --card:#fff; --text:#111; --muted:#666; }
+    *{box-sizing:border-box}
+    body{ margin:0;background:var(--bg);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text); }
+    .wrap{ max-width:520px;margin:0 auto;padding:20px; }
+    .card{ background:var(--card);border-radius:20px;padding:20px;
+      box-shadow:0 6px 24px rgba(0,0,0,.06); }
+    .title{ display:flex;align-items:center;gap:12px;margin:0 0 8px; }
+    .title img{ width:56px;height:auto }
+    .subtitle{ color:var(--muted);margin:0 0 12px;font-size:14px }
+    .row{ display:flex;justify-content:space-between;gap:10px;margin:8px 0 0;
+      color:var(--muted);font-size:13px;align-items:center;flex-wrap:wrap}
+    .pill{background:#ffe9f6;color:#b0127f;padding:4px 10px;border-radius:999px;font-weight:600}
+    .limit{background:#0044cc;color:#fff;border-radius:999px;padding:4px 10px;font-weight:700}
+    .q{ border:1px solid #eaeef2;border-radius:14px;padding:14px 14px 8px;margin:12px 0;background:#fff; }
+    .q h4{ margin:0 0 10px;font-size:16px;line-height:1.4 }
+    .opts{ display:grid;gap:8px }
+    .opt{ display:flex;align-items:center;gap:10px;border:1px solid #e6e8ec;
+      border-radius:12px;padding:10px 12px;background:#fcfcfd; }
+    .opt input{ transform:scale(1.2) }
+    .footer{ position:sticky;bottom:0;background:linear-gradient(180deg, rgba(245,247,250,0) 0%, #f5f7fa 30%);
+      padding:16px 0 4px; }
+    .btn{ width:100%;padding:14px 16px;border:none;border-radius:12px;background:var(--accent);
+      color:#fff;font-weight:700;font-size:16px;box-shadow:0 8px 20px rgba(228,48,176,.25); }
+    .btn:disabled{ opacity:.5 }
+    .notice{
+      background:#fff3d6;border:1px solid #ffd782;color:#7a4b00;
+      padding:10px 12px;border-radius:12px;margin:12px 0;font-size:14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title">
+        <img src="https://hengstylec9900.github.io/65-anniversary/logo-65.png" alt="65周年"/>
+        <div>
+          <h2 style="margin:0">恆會答｜Quiz 2</h2>
+          <div class="subtitle">可自由更改答案，以送出時選擇為準。<br/>每日限玩 <b>3 次</b>。</div>
+        </div>
+      </div>
+      <div class="row">
+        <div>玩家：<span id="playerName">-</span>｜員編：<span id="employeeId">-</span></div>
+        <div class="pill">UID: <span id="uid">-</span></div>
+        <div class="limit" id="limit">剩餘次數：3</div>
+      </div>
+
+      <div id="limitNotice" class="notice" style="display:none;"></div>
+
+      <form id="quizForm">
+        <div id="questions"></div>
+        <div class="footer">
+          <button type="submit" id="submitBtn" class="btn">送出作答並結算</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+const QUIZ_NAME = "恆會答｜Quiz 2";
+const MAX_ATTEMPTS = 3;
+
+// === 題庫：前8題 + 後10題 ===
+const QUESTIONS = [
+  { text: "關於恆隆行的創立，以下論述何者正確？", type: "mc", options: [
+    "1960年，陳德富先生創立恆隆行。",
+    "今年是恆隆行65週年",
+    "截至2024年12月恆隆行產品銷售額為90億",
+    "以上皆是。"
+  ], answerIndex: 3 },
+  { text: "65週年的主題是「生活是一場探索與冒險」嗎？", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "以下關於 zonezone概念店在恆隆行定位描述，何者正確？", type: "mc", options: [
+    "以選品服務、快修服務貼近顧客需求",
+    "嘗試各式飲食、文化、策展等體驗活動，啟動消費者好奇心",
+    "為品牌轉型與重塑的重要一環，是翻玩「生活」的實驗場",
+    "以上皆是。"
+  ], answerIndex: 3 },
+  { text: "「hence,」雜誌的精神是「Let’s eat together」。", type: "tf", options: ["Yes","No"], answerIndex: 1 },
+  { text: "恆隆行成立超過半世紀，歷史上是否曾經拓展到「相機產品」領域？", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "恆隆行第一次的logo轉變發生在2003年?", type: "tf", options: ["Yes","No"], answerIndex: 1 },
+  { text: "恆隆行的Mission為「我們致力於協助每個熱愛生活的人找生活」?", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "restyle2050 網站寫：這裡提供「可循環的選擇」。以下哪些商品可能是 restyle2050 回收整新的品項？", type: "mc", options: [
+    "箱損、外觀瑕疵之商品",
+    "展示機或退貨福利品",
+    "核心功能無虞之二手品",
+    "以上皆是。"
+  ], answerIndex: 3 },
+
+  // 後10題
+  { text: "以下哪些獎項為恆隆行曾獲得的肯定？", type: "mc", options: [
+    "Better Business Awards最佳企業領袖獎，2019年",
+    "Global Innovation Awards 傑出家居與家用品零售獎 全球零售商獎，2022年",
+    "Shopping Design Award Taiwan Design Best 100台灣設計 年度原創品牌大獎，2022年",
+    "以上皆是。"
+  ], answerIndex: 3 },
+  { text: "恆隆行目前共代理29個品牌？", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "以下哪個項目是恆隆行代理品牌的分類？", type: "mc", options: [
+    "廚房家電、餐廚用品",
+    "生活家電、生活風格與日用",
+    "健康美容家電",
+    "以上皆是。"
+  ], answerIndex: 3 },
+  { text: "Braun耳溫槍榮獲兒科醫生No.1 推薦品牌？", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "如果把Panasonic擬人化，他會是恆隆行的前世情人?", type: "tf", options: ["Yes","No"], answerIndex: 1 },
+  { text: "恆隆行代理品牌WMF在2025成為臺灣米其林指南首位唯一餐廚鍋具合作夥伴?", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "把品牌擬人化，恆隆行在2013年所代理的品牌Coway是韓國人?", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "恆隆行截至2025年9月26日，目前有74個專櫃(包含臨時櫃)，以下哪些屬於恆隆行貿易有限公司旗下的實體櫃位？", type: "mc", options: [
+    "Dyson",
+    "hengstyle恆隆行",
+    "hengstyle恆隆行kitchenware 以及 WMF 品牌櫃",
+    "以上皆是"
+  ], answerIndex: 3 },
+  { text: "公司外倉遷倉，從「永聯物流-大園倉」遷至「中法興物流-新屋倉」以及「百及物流(水源倉)」？", type: "tf", options: ["Yes","No"], answerIndex: 0 },
+  { text: "一輛遊覽車能載40人，請問8台遊覽車能載完恆隆行公司的全員工(包含派遣)嗎?", type: "tf", options: ["Yes","No"], answerIndex: 1 }
+];
+
+// === 每日次數紀錄 ===
+function todayTW() {
+  const now = new Date();
+  const tw = new Date(now.getTime() + 8*60*60*1000);
+  return tw.toISOString().slice(0,10);
+}
+function getAttemptsKey() {
+  const uid = localStorage.getItem("uid") || "device";
+  return `quiz2_attempts_${uid}_${todayTW()}`;
+}
+function readAttempts() {
+  return parseInt(localStorage.getItem(getAttemptsKey()) || "0", 10);
+}
+function writeAttempts(n) {
+  localStorage.setItem(getAttemptsKey(), String(n));
+}
+function updateLimitUI() {
+  const used = readAttempts();
+  const remain = Math.max(0, MAX_ATTEMPTS - used);
+  document.getElementById("limit").textContent = `剩餘次數：${remain}`;
+  if (remain <= 0) {
+    disableQuiz("今日已達 3 次上限，無法再作答。");
+  }
+}
+function disableQuiz(message) {
+  const notice = document.getElementById("limitNotice");
+  notice.textContent = message;
+  notice.style.display = "block";
+  document.querySelectorAll('input[type="radio"]').forEach(i => i.disabled = true);
+  document.getElementById("submitBtn").disabled = true;
+}
+
+// === 使用者資訊 ===
+async function initLIFF() {
+  try {
+    await liff.init({ liffId: "2007968657-RQJnjPVA" });
+    if (liff.isLoggedIn()) {
+      const profile = await liff.getProfile();
+      if (profile?.userId) localStorage.setItem("uid", profile.userId);
+    }
+  } catch(e) { console.warn("LIFF init failed:", e); }
+}
+function fillUser() {
+  const name = localStorage.getItem("playerName") || "匿名";
+  const empId = localStorage.getItem("employeeId") || "未填";
+  const uid = localStorage.getItem("uid") || "-";
+  document.getElementById("playerName").textContent = name;
+  document.getElementById("employeeId").textContent = empId;
+  document.getElementById("uid").textContent = uid.length>6 ? (uid.slice(0,6)+"…") : uid;
+}
+
+// === 題目渲染 ===
+function renderQuestions() {
+  const wrap = document.getElementById("questions");
+  wrap.innerHTML = "";
+  QUESTIONS.forEach((q, qi) => {
+    const qEl = document.createElement("div");
+    qEl.className = "q";
+    qEl.innerHTML = `<h4>${qi+1}. ${q.text}</h4>`;
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    q.options.forEach((opt, oi) => {
+      const label = document.createElement("label");
+      label.className = "opt";
+      label.innerHTML = `
+        <input type="radio" name="q${qi}" value="${oi}">
+        <span>${opt}</span>
+      `;
+      opts.appendChild(label);
+    });
+    qEl.appendChild(opts);
+    wrap.appendChild(qEl);
+  });
+}
+
+// === 成績計算 ===
+function grade() {
+  let correct = 0;
+  QUESTIONS.forEach((q, qi)=>{
+    const checked = document.querySelector(`input[name="q${qi}"]:checked`);
+    if (checked && q.options.indexOf(checked.nextElementSibling.textContent) === q.answerIndex) {
+      correct++;
+    }
+  });
+  return correct;
+}
+
+// === 提交 ===
+function submitQuiz(e){
+  e.preventDefault();
+  const used = readAttempts();
+  if (used >= MAX_ATTEMPTS) { updateLimitUI(); return; }
+  writeAttempts(used + 1);
+
+  const correctCount = grade();
+  let score = correctCount * 100;
+  if (used === 0 && correctCount === QUESTIONS.length) {
+    score += 20000;
+  }
+
+  const prevTotal = parseInt(localStorage.getItem("totalScore") || "0", 10);
+  const newTotal = prevTotal + score;
+  localStorage.setItem("totalScore", newTotal);
+  localStorage.setItem("latestScore", score);
+  localStorage.setItem("currentGame", QUIZ_NAME);
+  localStorage.setItem("currentGameFile", "quiz_2.html");
+
+  const payload = {
+    login_time: new Date(Date.now()+8*60*60*1000).toISOString().slice(0,19).replace("T"," "),
+    uid: localStorage.getItem("uid") || "unknown",
+    playerName: localStorage.getItem("playerName") || "匿名",
+    employeeId: localStorage.getItem("employeeId") || "未填",
+    game_name: QUIZ_NAME,
+    score: score,
+    total_score: newTotal,
+    attempts_used: used + 1,
+    attempts_max: MAX_ATTEMPTS
+  };
+
+  fetch("https://defaultd4adf1368c41437283cecd805049bd.23.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f37895b64f074ea1bdb40f14c4fbbfb9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cE-TkpRymVO7a3co5lI1ZTY7xBYKKoCiANkFzzLDK3U", {
+    method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)
+  }).finally(()=>{
+    window.location.href = "game_end_screen.html";
+  });
+}
+
+// === 初始化 ===
+initLIFF().finally(()=>{
+  fillUser();
+  renderQuestions();
+  updateLimitUI();
+  document.getElementById("quizForm").addEventListener("submit", submitQuiz);
+});
+</script>
+</body>
+</html>
